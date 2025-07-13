@@ -1,0 +1,76 @@
+{
+	"name": "dataflowfordebug",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "dep2data",
+						"type": "DatasetReference"
+					},
+					"name": "empanddeptdata"
+				},
+				{
+					"dataset": {
+						"referenceName": "dep2data",
+						"type": "DatasetReference"
+					},
+					"name": "depdata"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "empdepdataoutput",
+						"type": "DatasetReference"
+					},
+					"name": "empdepdata"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as string,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DepartmentID as string,",
+				"          Salary as string,",
+				"          JoiningDate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empanddeptdata",
+				"source(output(",
+				"          EmployeeID as string,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          DepartmentID as string,",
+				"          Salary as string,",
+				"          JoiningDate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> depdata",
+				"derivedColumn1, depdata join(empanddeptdata@DepartmentID == depdata@DepartmentID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"empanddeptdata derive(FirstName = upper(FirstName)) ~> derivedColumn1",
+				"join1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['empdepdatafile'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> empdepdata"
+			]
+		}
+	}
+}

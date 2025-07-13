@@ -1,0 +1,72 @@
+{
+	"name": "alterrowdataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "alterrowdata",
+						"type": "DatasetReference"
+					},
+					"name": "alteringdatasource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as integer,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          Department as string,",
+				"          Salary as integer,",
+				"          Action as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> alteringdatasource",
+				"alteringdatasource alterRow(upsertIf(Salary>50000)) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          empid as integer,",
+				"          firstname as string,",
+				"          lastname as string,",
+				"          depname as string,",
+				"          salary as integer,",
+				"          action as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['salary'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          empid = EmployeeID,",
+				"          firstname = FirstName,",
+				"          lastname = LastName,",
+				"          depname = Department,",
+				"          salary = Salary,",
+				"          action = Action",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

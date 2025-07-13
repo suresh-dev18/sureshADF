@@ -1,0 +1,35 @@
+{
+	"name": "pipeline3_webactivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"content_type": "application/json"
+					},
+					"url": "https://jsonplaceholder.typicode.com/posts",
+					"body": {
+						"title": "Azure Data Factory Web Activity",
+						"body": "This is a test post from ADF",
+						"userId": 1
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-07-01T09:08:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

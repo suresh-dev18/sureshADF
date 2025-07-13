@@ -1,0 +1,59 @@
+{
+	"name": "dataflow for flatten",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "flattenJsonsource",
+						"type": "DatasetReference"
+					},
+					"name": "flattensourcejson"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "empdepdataoutput",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          OrderID as integer,",
+				"          Customer as string,",
+				"          OrderDate as string,",
+				"          Items as (Product as string, Price as integer, Quantity as integer)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> flattensourcejson",
+				"flattensourcejson foldDown(unroll(),",
+				"     mapColumn(",
+				"          OrderID,",
+				"          Customer,",
+				"          OrderDate,",
+				"          Items",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['flattenoutput'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

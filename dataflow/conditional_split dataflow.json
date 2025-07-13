@@ -1,0 +1,93 @@
+{
+	"name": "conditional_split dataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "consolidatedfile",
+						"type": "DatasetReference"
+					},
+					"name": "itemployees"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "empdepdataoutput",
+						"type": "DatasetReference"
+					},
+					"name": "itemployeesfile"
+				},
+				{
+					"dataset": {
+						"referenceName": "empdepdataoutput",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "empdepdataoutput",
+						"type": "DatasetReference"
+					},
+					"name": "financeemp"
+				},
+				{
+					"dataset": {
+						"referenceName": "empdepdataoutput",
+						"type": "DatasetReference"
+					},
+					"name": "marketingfile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "consdata"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmployeeID as string,",
+				"          Name as string,",
+				"          Department as string,",
+				"          Salary as string,",
+				"          Experience as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> itemployees",
+				"itemployees split(equals(Department,'IT'),",
+				"     equals(Department,'HR'),",
+				"     equals(Department,'Finance'),",
+				"     disjoint: false,",
+				"     partitionBy('hash', 1)) ~> consdata@(itdepartment, HRdetails, finance, marketingfile)",
+				"consdata@itdepartment sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['itemployeesdeptwise.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> itemployeesfile",
+				"consdata@HRdetails sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['hrdetails.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1",
+				"consdata@finance sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['financeemployees.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> financeemp",
+				"consdata@marketingfile sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['marketingemps.txt'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> marketingfile"
+			]
+		}
+	}
+}
