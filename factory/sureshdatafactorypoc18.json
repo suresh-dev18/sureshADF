@@ -1,0 +1,17 @@
+{
+	"name": "sureshdatafactorypoc18",
+	"properties": {
+		"globalParameters": {
+			"webapiurl": {
+				"type": "string",
+				"value": "https://restcountries.com/v3.1/all"
+			}
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "913682ea-ac06-4a1f-9df7-856b72187f95",
+		"tenantId": "4f350547-ff23-450c-be05-16301fec8e05"
+	}
+}

@@ -1,0 +1,45 @@
+{
+	"name": "dataflow-parameterized",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flowparameterized",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "dataflowparameterized",
+						"type": "DataFlowReference",
+						"parameters": {
+							"depname": {
+								"value": "'@{pipeline().parameters.depname}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"depname": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-07-11T13:51:27Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
